@@ -37,25 +37,19 @@ v-model:nach-name="nachName"
 ></personal-com>
         <!-- Reservation Component (Dynamic Add / Remove) -->
         <div class="container text-center mt-5 " v-show="showCom">
-      <div class="row m-3 align-items-center" style="justify-content: space-evenly;">
-      <div class="col-2  ml-3" style="padding-right: 150px;">
-        <h4></h4>
-        </div>
-        <div class="col-3 " style="padding-right: 100px;">
-        <h4>Art</h4>
-        </div>
-        <div class="col-3 " style="padding-right: 110px;">
-        <h4>Vom</h4>
-        </div>
-        <div class="col-3 " style="padding-right: 120px;">
-        <h4>Bis</h4>
-        </div>
-        <div class="col-3 " style="padding-right: 120px;">
-        <h4>Betrag</h4>
-        </div>
+      <table class="table ">
+            <thead>
+              <tr>
+                <th class="col-1"></th>
+                <th class="col-1">Art</th>
+                <th class="col-2">Begin Date</th>
+                <th class="col-1">End Date</th>
+                <th class="col-2">Betrag</th>
+              </tr>
+            </thead>
+        </table>
 
 
-      </div>
       </div>
 
         <div v-show="showCom" class=" m-2 col-10 align-items-center">
