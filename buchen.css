@@ -8,7 +8,7 @@ body{
     background-color: bisque;
 }
 .sec{
-    height: 500px;
+    height: fit-content;
     background-color: white;
     border: solid 2px bisque;
     padding: 0 !important;

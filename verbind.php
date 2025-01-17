@@ -2,7 +2,7 @@
 
 <?php
 //== I had a connection error so i used this line======
-$db_port = '3307';
+$db_port = '3306';
 //====================================================
 $host= 'localhost';
 $username='root';

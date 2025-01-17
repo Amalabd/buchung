@@ -1,206 +1,239 @@
 const app = Vue.createApp({
- 
-    data() {
-      return {
-        count: 0,
-        showCom: true,
-        vorName:'',
-        nachName:'',
-        beginDate:null,
-        endDate:null,
-        daysDifference: 0,
-        invalidDate: false,
-        select: '',
-        
+  data() {
+    return {
+      count: 1,
+      showCom: true,
+      res: true,
+      vorName: '',
+      nachName: '',
+      showRechnung: false,
+      lines: [
+        {
+          beginDate: null,
+          endDate: null,
+          daysDifference: 0,
+          select: '',
+        }
+      ]
+    };
+  },
+  methods: {
+
+    toggleComponents(index, checked) {
+      if (checked) {
+        this.lines.push({
+          beginDate: null,
+          endDate: null,
+          daysDifference: 0,
+          select: '',
+        });
+      } else {
+        if (this.lines.length > 1) {
+          this.lines.pop();
+        }
       }
     },
-    methods: {
-        toggleComponents(event) {
-            if (event.target.checked) {
-              this.count++;
-            } else {
-              this.count = Math.max(this.count - 1, 0);
-            }
-          },
-        },
-        computed: {
-          total() {
-            if (this.daysDifference > 0) {
-              return this.select == 1
-                ? 160 * this.daysDifference
-                : 80 * this.daysDifference;
-            }
-            return 0;
-          },
-        },
-  });
-  // ----------- Component Personal Data ---------
-  //===============================================
-
-  app.component('personal-com', {
-    props:["vorName", "nachName"],
-    emits: ["update:vor-name", "update:nach-name"],
-    data() {
-      return {
-        
-      };
+    toRechnung() {
+      this.showRechnung = !this.showRechnung;
+      this.showCom = !this.showCom;
     },
+    getBack() {
+      this.showRechnung = !this.showRechnung;
+      this.showCom = !this.showCom ;  }
+    
+  },
+  computed: {
+    lineTotals() {
+      return this.lines.map(line => {
+        if (line.daysDifference > 0) {
+          return line.select == "Vollpension" 
+          ? 160 * line.daysDifference 
+          : 80 * line.daysDifference;
+        }
+        return 0;
+      });
+    }
+  }
+});
 
-    template: /*html*/
-  `
 
+// Personal Information Component
+app.component('personal-com', {
+  props: ["vorName", "nachName"],
+  emits: ["update:vor-name", "update:nach-name"],
+  template: /*html*/
+    `
     <div class="shadow pt-4 titl">
         <h1 class=" text-success">Machen Sie jetzt Ihre Buchung</h1>
     </div>
 
     <div class="input-group mt-4 container">
-  <span class="input-group-text spn m-2">Vor und Nach Name</span>
-  <input type="text" :value="vorName" 
-  @input="$emit('update:vor-name', $event.target.value)" placeholder="Vorname" class="form-control m-2" required>
-  <input type="text" :value="nachName" 
-  @input="$emit('update:nach-name', $event.target.value)" placeholder="Nachname" class="form-control m-2" required><br>
-  <p> name is: {{vorName}} {{nachName}}</p>
-</div>
-<hr>
-<div class="container">
-<div class="row txt">
-    <h5 class="col-3 "></h5>
-    <h5 class="col-7 ">Art</h5>
+      <span class="input-group-text spn m-2 shadow rounded">Vor und Nach Name</span>
 
-    <h5 class="col-10 ">Vom</h5>
+      <input
+  type="text"
+  :value="vorName"
+  @input="$emit('update:vor-name', $event.target.value)"
+  placeholder="Vorname"
+  class="form-control m-2 shadow rounded"
+  required
+>
+<input
+  type="text"
+  :value="nachName"
+  @input="$emit('update:nach-name', $event.target.value)"
+  placeholder="Nachname"
+  class="form-control m-2 shadow rounded"
+  required
+>
+ 
+    </div>
+    <hr>
 
-    <h5 class="col-9  ">Bis</h5>
-    <h5 class="col-10 ">Summe</h5>
-
-</div>
-
-</div>
-
-  `
+    `,
 
 });
-  // ---------Resrvation Data -------------
-  //=========================================
 
-  app.component('buchen-com', {
-    props: ['beginDate', 'endDate', 'daysDifference', 'total', 'select'],
-  emits: ['update:begin-date', 'update:end-date', 'update:days-difference', 'update:select'],
-      data() {
-      return {
-
-        invalidDate: false,
-        select: '',
-      };
-    },
-    methods: {
-
-      calculateDays() {
-        if (this.beginDate && this.endDate) {
-          const begin = new Date(this.beginDate).getTime();
-          const end = new Date(this.endDate).getTime();
-          const difference = end - begin;
-          this.$emit('update:days-difference', difference >= 0 ? difference / 86400000 : 0);
-        } else {
-          this.$emit('update:days-difference', 0);
-        }
-      },
-        },
-
-    watch: {
-      beginDate(newBeginDate) {
-        const today = new Date();
+// Reservation Component
+app.component('buchen-com', {
+  props: ['beginDate', 'endDate', 'select', 'lineTotal'],
+  emits: ['update:begin-date', 'update:end-date', 'update:select', 'update:days-difference', 'toggle-line'],
+  methods: {
+    calculateDays() {
+      if (this.beginDate && this.endDate) {
+        const begin = new Date(this.beginDate).getTime();
+        const end = new Date(this.endDate).getTime();
+        const difference = end - begin;
+        const days = difference >= 0 ? difference / 86400000 : 0;
+        this.$emit('update:days-difference', days);
+      }
+    }
+  },
+  watch: {
+    beginDate(newValue) {
+      const today = new Date();
         today.setHours(0, 0, 0, 0);
-        if (newBeginDate && new Date(newBeginDate) < today) {
+        if (newValue && new Date(newValue) < today) {
           alert('Begin date ungültig');
           this.$emit('update:begin-date', null);
+        }else{
+      this.calculateDays();
+      this.$emit('update:begin-date', newValue);
         }
-      },
-      endDate(newEndDate) {
-        const today = new Date();
+    },
+    endDate(newValue) {
+      const today = new Date();
         today.setHours(0, 0, 0, 0);
-        if (newEndDate && new Date(newEndDate) < today) {
-          alert('End date ungültig');
+        if (newValue && new Date(newValue) < today) {
+          alert('End Datum ungültig');
           this.$emit('update:end-date', null);
-        } else if (this.beginDate && new Date(newEndDate) < new Date(this.beginDate)) {
-          alert('End date cannot be before begin date');
+        } else if (this.beginDate && new Date(newValue) <= new Date(this.beginDate)) {
+          alert('End Datum soll nachdem Begin Datum sein');
           this.$emit('update:end-date', null);
-        }
-      },
-      },
-    
-    
-    
-    template: /*html*/
-    `
-    <div class="container text-center">
+      
+      
+        }else{
+      this.calculateDays();
+      this.$emit('update:end-date', newValue);}
+    }
+  },
+  template: `
+    <div class="container text-center mt-5">
       <div class="row m-3 align-items-center">
+      <div class="col-2">
+      <span class="text-success"> &#10009; </span>
+<input type="checkbox" 
+       @click="$emit('toggle-line', index, $event.target.checked)" 
+       class="form-check-input">
+      <span class="text-danger"> &#9866; </span>
+
+
+      </div>
+
         <div class="col-3">
-          <select v-model="select" @change="$emit('update:select', select)" class="form-select">
-            <option value="" disabled selected>Wählen Sie hier aus!</option>
-            <option value="1">Vollpension</option>
-            <option value="2">Halbpension</option>
+          <select :value="select" 
+                  @change="$emit('update:select', $event.target.value)" 
+                  class="form-select" required>
+            <option value="" disabled selected> Wählen Sie hier aus!</option>
+            <option value="Vollpension">Vollpension</option>
+            <option value="Halbpension">Halbpension</option>
           </select>
         </div>
-
         <div class="col-3">
           <input type="date" 
                  :value="beginDate" 
                  @input="$emit('update:begin-date', $event.target.value)" 
-                 @change="calculateDays" 
                  class="form-control">
         </div>
-
         <div class="col-3">
           <input type="date" 
                  :value="endDate" 
                  @input="$emit('update:end-date', $event.target.value)" 
-                 @change="calculateDays" 
                  class="form-control">
         </div>
-
         <div class="col-3">
-          <input type="text" class="form-control" readonly :value="total + ' €'">
+          <input type="text" class="form-control" readonly :value="lineTotal + ' €'">
         </div>
       </div>
     </div>
-       
+  `
+});
 
+
+// Bill Summary Component
+app.component('bill-com', {
+  props: ['vorName', 'nachName', 'lines'],
+  computed: {
+    totalAmount() {
+      return this.lines.reduce((sum, line) => {
+        if (line.daysDifference > 0) {
+          return sum + (line.select == "Vollpension" ? 160 * line.daysDifference : 80 * line.daysDifference);
+        }
+        return sum;
+      }, 0);
+    }
+  },
+  template: /*html*/
     `
-  });
-
-   // ---------The Bill -------------
-  //=========================================
-
-  app.component('bill-com', {
-    props: ['beginDate', 'endDate', 'daysDifference', 'total', 'vorName', 'nachName'],
-
-    data() {
-      return {
-
-      };
-    },
-
-
-    template: /*html*/
-    `
-    <div class="container align-items-center border">
-      <div class=" col-12 border">
-            <h3>Reservation Summary</h3>
+    <div>
+      <div class="container text-center m-4">
+        <h1 class="text-success">Rechnung &#9998;</h1>
       </div>
-
-      <div class=" m-3 align-items-center border">
-
-      <p><strong>VorName:</strong> {{ vorName }}</p>
-      <p><strong>Nach Name:</strong> {{ nachName }}</p>
-      <p><strong>Begin Date:</strong> {{ beginDate }}</p>
-      <p><strong>End Date:</strong> {{ endDate }}</p>
-      <p><strong>Number of Days:</strong> {{ daysDifference }}</p>
-      <p><strong>Total Price:</strong> {{ total }} €</p>
+      <div class="container border rounded shadow p-3 mt-3">
+        <div class="row m-3">
+          <p><strong>Buchung unter Namen:::amal</strong> {{ vorName }} {{ nachName }}</p>
+        </div>
+        <div class="container align-items-center m-3">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Art</th>
+                <th scope="col">Begin Date</th>
+                <th scope="col">End Date</th>
+                <th scope="col">Tagen</th>
+                <th scope="col">Betrag</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(line, idx) in lines" :key="idx">
+                <th>{{ idx + 1 }}</th>
+                <td>{{ line.select }}</td>
+                <td>{{ line.beginDate }}</td>
+                <td>{{ line.endDate }}</td>
+                <td>{{ line.daysDifference }}</td>
+                <td>{{ (line.select == "Vollpension" ? 160 * line.daysDifference : 80 * line.daysDifference) }} €</td>
+              </tr>
+              <tr>
+                <td colspan="2"><strong>Gesamtbetrag in €:</strong></td>
+                <td colspan="4">{{ totalAmount }} €</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-
-  </div>
-       
-
     `
 });
-  app.mount('#app');
+
+app.mount('#app');
