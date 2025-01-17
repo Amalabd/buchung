@@ -36,10 +36,13 @@ const app = Vue.createApp({
     toRechnung() {
       this.showRechnung = !this.showRechnung;
       this.showCom = !this.showCom;
+      console.log('showRechnung:', this.showRechnung); // Debug log
     },
     getBack() {
       this.showRechnung = !this.showRechnung;
-      this.showCom = !this.showCom ;  }
+      this.showCom = !this.showCom ; 
+      console.log('showRechnung:', this.showRechnung); // Debug log
+    }
     
   },
   computed: {
@@ -138,7 +141,7 @@ app.component('buchen-com', {
     }
   },
   template: `
-    <div class="container text-center mt-5">
+    <div class="container text-center ">
       <div class="row m-3 align-items-center">
       <div class="col-2">
       <span class="text-success"> &#10009; </span>
@@ -201,7 +204,7 @@ app.component('bill-com', {
       </div>
       <div class="container border rounded shadow p-3 mt-3">
         <div class="row m-3">
-          <p><strong>Buchung unter Namen:::amal</strong> {{ vorName }} {{ nachName }}</p>
+          <p><strong>Buchung unter Namen:</strong> <span class="txt fw-bold">{{ vorName }} {{ nachName }}</span></p>
         </div>
         <div class="container align-items-center m-3">
           <table class="table">

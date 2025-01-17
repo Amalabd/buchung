@@ -1,6 +1,3 @@
-<?php
-include_once("verbind.php");
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,7 +36,29 @@ v-model:vor-name="vorName"
 v-model:nach-name="nachName" 
 ></personal-com>
         <!-- Reservation Component (Dynamic Add / Remove) -->
-        <div v-if="showCom" class=" m-2 col-10 align-items-center">
+        <div class="container text-center mt-5 " v-show="showCom">
+      <div class="row m-3 align-items-center" style="justify-content: space-evenly;">
+      <div class="col-2  ml-3" style="padding-right: 150px;">
+        <h4></h4>
+        </div>
+        <div class="col-3 " style="padding-right: 100px;">
+        <h4>Art</h4>
+        </div>
+        <div class="col-3 " style="padding-right: 110px;">
+        <h4>Vom</h4>
+        </div>
+        <div class="col-3 " style="padding-right: 120px;">
+        <h4>Bis</h4>
+        </div>
+        <div class="col-3 " style="padding-right: 120px;">
+        <h4>Betrag</h4>
+        </div>
+
+
+      </div>
+      </div>
+
+        <div v-show="showCom" class=" m-2 col-10 align-items-center">
             <buchen-com 
     v-for="(line, index) in lines" 
     :key="index"
@@ -47,7 +66,6 @@ v-model:nach-name="nachName"
     :end-date="line.endDate"
     :select="line.select"
     :line-total="lineTotals[index]"
-    :index="index"
     @update:begin-date="(value) => line.beginDate = value"
     @update:end-date="(value) => line.endDate = value"
     @update:days-difference="(value) => line.daysDifference = value"
@@ -58,20 +76,21 @@ v-model:nach-name="nachName"
 
         </div>
 
-        <button @click="toRechnung" class="btn btn-success m-4 shadow" v-if="showCom">Rechnung &#10150;</button>
-        <button onclick="location.reload()" class="btn btn-danger m-4 shadow" v-if="showCom">Reset Seite &#9851;</button>
+        <button @click="toRechnung" class="btn btn-success m-4 shadow" v-if="showCom">Rechnung &#10140;</button>
+        <button onclick="location.reload()" class="btn btn-danger m-4 shadow" v-if="showCom">Reset Seite &orarr;</button>
 
 
 
         <!-- Reservation Summary -->
+        <div v-if="showRechnung">
   <bill-com 
     :lines="lines" 
     :vor-name="vorName" 
     :nach-name="nachName" 
-    v-if="showRechnung"
   />
-
-<button @click="getBack" class="btn btn-success mt-2 mb-2 shadow" v-if="showRechnung">Zurück &#10150;</button>
+</div>
+<button @click="getBack" class="btn btn-success mt-3 mb-3 shadow" v-if="showRechnung" >
+&#8617; Zurück</button>
 
     </div>
 </div>
