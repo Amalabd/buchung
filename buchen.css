@@ -1,8 +1,18 @@
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
 body{
     background-image: url("pic/background.jpg"); 
     background-size:contain;
     font-family: Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+#app {
+  flex: 1;
 }
 .naa{
     background-color: bisque;
