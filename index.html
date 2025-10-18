@@ -55,11 +55,13 @@
               :end-date="line.endDate"
               :select="line.select"
               :line-total="lineTotals[index]"
+              :row-index="index"
               @update:begin-date="(value) => line.beginDate = value"
               @update:end-date="(value) => line.endDate = value"
               @update:days-difference="(value) => line.daysDifference = value"
               @update:select="(value) => line.select = value"
-             @toggle-line="toggleComponents"
+              @add-line="addLineAfter"
+              @remove-line="removeLineAt"
             />
         </div>
 

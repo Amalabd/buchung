@@ -18,19 +18,18 @@ const app = Vue.createApp({
     };
   },
   methods: {
-
-    toggleComponents(index, checked) {
-      if (checked) {
-        this.lines.push({
-          beginDate: null,
-          endDate: null,
-          daysDifference: 0,
-          select: '',
-        });
-      } else {
-        if (this.lines.length > 1) {
-          this.lines.pop();
-        }
+    addLineAfter(index) {
+      const newLine = {
+        beginDate: null,
+        endDate: null,
+        daysDifference: 0,
+        select: '',
+      };
+      this.lines.splice(index + 1, 0, newLine);
+    },
+    removeLineAt(index) {
+      if (this.lines.length > 1) {
+        this.lines.splice(index, 1);
       }
     },
     toRechnung() {
@@ -99,8 +98,8 @@ app.component('personal-com', {
 
 // Reservation Component
 app.component('buchen-com', {
-  props: ['beginDate', 'endDate', 'select', 'lineTotal'],
-  emits: ['update:begin-date', 'update:end-date', 'update:select', 'update:days-difference', 'toggle-line'],
+  props: ['beginDate', 'endDate', 'select', 'lineTotal', 'rowIndex'],
+  emits: ['update:begin-date', 'update:end-date', 'update:select', 'update:days-difference', 'add-line', 'remove-line'],
   methods: {
     calculateDays() {
       if (this.beginDate && this.endDate) {
@@ -144,13 +143,12 @@ app.component('buchen-com', {
     <div class="container text-center ">
       <div class="row m-3 align-items-center">
       <div class="col-2">
-      <span class="text-success"> &#10009; </span>
-<input type="checkbox" 
-       @click="$emit('toggle-line', index, $event.target.checked)" 
-       class="form-check-input">
-      <span class="text-danger"> &#9866; </span>
-
-
+        <button type="button" class="btn btn-sm btn-outline-success" @click="$emit('add-line', rowIndex)">
+          <i class="fas fa-plus"></i>
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-danger ms-2" @click="$emit('remove-line', rowIndex)">
+          <i class="fas fa-minus"></i>
+        </button>
       </div>
 
         <div class="col-3">
